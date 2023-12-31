@@ -9,16 +9,16 @@
 </head>
 <body>
     <nav class="navbar bg-dark navbar-dark">
-        <div class="container" style="width:600px">
+        <div class="container" style="max-width: 600px">
             <a href="#" class="navbar-brand">Category</a>
         </div>
     </nav>
     
-    <div class="container" style="width: 600px">
-        <div class="input-group my-4">
+    <div class="container" style="max-width: 600px">
+        <form id="add" class="input-group my-4">
             <input type="text" class="form-control">
             <button class="btn btn-dark">Add</button>
-        </div>
+        </form>
 
         <ul id="list" class="list-group"></ul>
     </div>
@@ -32,7 +32,9 @@
                 createItem(item);
             }));
 
-        document.querySelector("button").onclick = () => {
+        document.querySelector("#add").onsubmit = e => {
+            e.preventDefault();
+
             let name = document.querySelector("input").value;
             if(!name) return false;
 
@@ -53,13 +55,32 @@
             li.innerHTML = `<span>${item.name}</span>`;
 
             let del = document.createElement("a");
-            del.classList.add("fa-solid", "fa-trash", "float-end");
+            del.classList.add("fa-solid", "fa-trash", "float-end", "text-danger");
             del.setAttribute("href", "#");
             del.onclick = () => {
                 fetch(`${api}/${item.id}`, { method: 'delete' });
                 li.remove();
             }
             li.appendChild(del);
+
+            let edit = document.createElement("a");
+            edit.classList.add("fa-solid", "fa-edit", "float-start", "me-3");
+            edit.setAttribute("href", "#");
+            edit.onclick = () => {
+                let currentName = li.querySelector("span").textContent;
+                let updatedName = prompt("Enter name", currentName);
+                if(updatedName) {
+                    fetch(`${api}/${item.id}`, {
+                        method: "put",
+                        body: JSON.stringify({ name: updatedName }),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                    li.querySelector("span").textContent = updatedName;
+                }
+            }
+            li.appendChild(edit);
 
             document.querySelector("#list").appendChild(li);
         }

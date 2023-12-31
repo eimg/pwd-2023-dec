@@ -17,7 +17,7 @@ class CategoryApiController extends Controller
     public function store(Request $request)
     {
         $name = $request->name;
-        if(!$name) return ['msg' => 'name required'];
+        if(!$name) return response(['msg' => 'name required'], 400);
 
         $category = new Category;
         $category->name = $name;
@@ -36,7 +36,7 @@ class CategoryApiController extends Controller
     public function update(Request $request, Category $category)
     {
         $name = $request->name;
-        if (!$name) return ['msg' => 'name required'];
+        if (!$name) return response(['msg' => 'name required'], 400);
 
         $category->name = $name;
         $category->save();
