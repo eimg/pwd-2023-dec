@@ -4,10 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Category</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/all.min.css">
 </head>
 <body>
-    <h1>Category</h1>
-    <ul id="list"></ul>
+    <nav class="navbar bg-dark navbar-dark">
+        <div class="container" style="width:600px">
+            <a href="#" class="navbar-brand">Category</a>
+        </div>
+    </nav>
+    
+    <div class="container" style="width: 600px">
+        <div class="input-group my-4">
+            <input type="text" class="form-control">
+            <button class="btn btn-dark">Add</button>
+        </div>
+
+        <ul id="list" class="list-group"></ul>
+    </div>
 
     <script>
         const api = "http://localhost:8000/api/categories";
@@ -18,9 +32,35 @@
                 createItem(item);
             }));
 
+        document.querySelector("button").onclick = () => {
+            let name = document.querySelector("input").value;
+            if(!name) return false;
+
+            fetch(api, {
+                method: 'post',
+                body: JSON.stringify({ name }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(res => res.json())
+            .then(item => createItem(item));
+        }
+
         function createItem(item) {
             let li = document.createElement("li");
+            li.classList.add("list-group-item");
             li.innerHTML = `<span>${item.name}</span>`;
+
+            let del = document.createElement("a");
+            del.classList.add("fa-solid", "fa-trash", "float-end");
+            del.setAttribute("href", "#");
+            del.onclick = () => {
+                fetch(`${api}/${item.id}`, { method: 'delete' });
+                li.remove();
+            }
+            li.appendChild(del);
+
             document.querySelector("#list").appendChild(li);
         }
     </script>
